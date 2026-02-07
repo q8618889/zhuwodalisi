@@ -1224,7 +1224,7 @@ function openRedEnvelope() {
 
   if (blessingEl) blessingEl.classList.remove('show');
 
-  const gil = Math.floor(100000 + Math.random() * 900001);
+  const gil = Math.floor(1550000 + Math.random() * (2500000 - 1550000 + 1));
   amountEl.innerHTML = gil.toLocaleString() + '<span class="unit">Gil</span>';
   amountWrap.style.opacity = '0';
   amountWrap.style.transform = 'scale(0.5)';
