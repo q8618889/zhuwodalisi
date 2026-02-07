@@ -1241,12 +1241,31 @@ function bindRedEnvelope() {
   }
 }
 
-// 网易云会员中奖概率：490 分之 1
-const RED_ENVELOPE_SPECIAL_RATE = 1 / 490;
+// 网易云会员：前 15 次固定 1/490，之后概率线性提升，约第 100 次时 100% 中奖
+const RED_ENVELOPE_BASE_RATE = 1 / 490;
 const RED_ENVELOPE_SPECIAL_PRIZE = '🎵 网易云会员一个月';
+const RED_ENVELOPE_DRAW_KEY = 'red_envelope_draw_count';
+const RED_ENVELOPE_FLAT_DRAWS = 15;
+const RED_ENVELOPE_PITY_DRAWS = 100;
 
 const HINT_NORMAL = '祝你好运🍀）';
 const HINT_SPECIAL = '祝你好运🍀';
+
+function getRedEnvelopeDrawCount() {
+  const n = parseInt(localStorage.getItem(RED_ENVELOPE_DRAW_KEY), 10);
+  return isNaN(n) || n < 0 ? 0 : n;
+}
+
+function setRedEnvelopeDrawCount(n) {
+  localStorage.setItem(RED_ENVELOPE_DRAW_KEY, String(n));
+}
+
+function getRedEnvelopeSpecialRate(drawCount) {
+  if (drawCount < RED_ENVELOPE_FLAT_DRAWS) return RED_ENVELOPE_BASE_RATE;
+  if (drawCount >= RED_ENVELOPE_PITY_DRAWS) return 1;
+  const progress = (drawCount - RED_ENVELOPE_FLAT_DRAWS) / (RED_ENVELOPE_PITY_DRAWS - RED_ENVELOPE_FLAT_DRAWS);
+  return RED_ENVELOPE_BASE_RATE + (1 - RED_ENVELOPE_BASE_RATE) * progress;
+}
 
 function openRedEnvelope() {
   const overlay = document.getElementById('redEnvelopeOverlay');
@@ -1261,7 +1280,11 @@ function openRedEnvelope() {
 
   if (blessingEl) blessingEl.classList.remove('show');
 
-  const isSpecial = Math.random() < RED_ENVELOPE_SPECIAL_RATE;
+  const drawCount = getRedEnvelopeDrawCount();
+  const specialRate = getRedEnvelopeSpecialRate(drawCount);
+  const isSpecial = Math.random() < specialRate;
+
+  setRedEnvelopeDrawCount(drawCount + 1);
 
   if (isSpecial) {
     if (amountLabelEl) amountLabelEl.textContent = '特别奖';
