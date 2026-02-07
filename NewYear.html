@@ -506,28 +506,28 @@
     cursor: pointer;
     background: none;
     border: none;
-    padding: 20px;
-    min-width: 80px;
-    min-height: 80px;
+    padding: 28px;
+    min-width: 140px;
+    min-height: 140px;
     transition: transform 0.2s;
     animation: envelopeFloat 2s ease-in-out infinite;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    font-size: 4rem;
+    font-size: 7rem;
     line-height: 1;
   }
-  .red-envelope-btn:hover { transform: scale(1.15); }
+  .red-envelope-btn:hover { transform: scale(1.1); }
   .red-envelope-btn:active { transform: scale(0.95); }
   @keyframes envelopeFloat {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    50% { transform: translateY(-8px); }
   }
   @media (max-width: 600px) {
     .red-envelope-btn {
-      min-width: 72px;
-      min-height: 72px;
-      padding: 24px;
-      font-size: 3.5rem;
+      min-width: 120px;
+      min-height: 120px;
+      padding: 28px;
+      font-size: 5.5rem;
     }
   }
 
@@ -580,6 +580,26 @@
     0% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.3); opacity: 0.8; }
     100% { transform: scale(1.2); opacity: 0; }
+  }
+  .red-envelope-modal .red-envelope-blessing {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4);
+    letter-spacing: 0.4em;
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .red-envelope-modal .red-envelope-blessing.show {
+    opacity: 1;
+    transform: scale(1);
+    animation: blessingGlow 1.5s ease-in-out infinite;
+  }
+  @keyframes blessingGlow {
+    0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4); filter: brightness(1); }
+    50% { text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 60px rgba(255,215,0,0.6); filter: brightness(1.15); }
   }
   .red-envelope-modal .amount-wrap {
     margin: 20px 0;
@@ -804,6 +824,7 @@
 <div class="red-envelope-overlay" id="redEnvelopeOverlay">
   <div class="red-envelope-modal">
     <div class="envelope-icon">🧧</div>
+    <div class="red-envelope-blessing" id="redEnvelopeBlessing">马年吉祥</div>
     <div class="amount-wrap" id="redEnvelopeAmountWrap">
       <div class="amount-label">FF14 金币</div>
       <div class="amount" id="redEnvelopeAmount">0<span class="unit">Gil</span></div>
@@ -1196,9 +1217,12 @@ function openRedEnvelope() {
   const overlay = document.getElementById('redEnvelopeOverlay');
   const amountEl = document.getElementById('redEnvelopeAmount');
   const amountWrap = document.getElementById('redEnvelopeAmountWrap');
+  const blessingEl = document.getElementById('redEnvelopeBlessing');
   const modal = overlay ? overlay.querySelector('.red-envelope-modal') : null;
 
   if (!overlay || !amountEl) return;
+
+  if (blessingEl) blessingEl.classList.remove('show');
 
   const gil = Math.floor(100000 + Math.random() * 900001);
   amountEl.innerHTML = gil.toLocaleString() + '<span class="unit">Gil</span>';
@@ -1224,6 +1248,10 @@ function openRedEnvelope() {
   }
 
   setTimeout(() => {
+    if (blessingEl) blessingEl.classList.add('show');
+  }, 350);
+
+  setTimeout(() => {
     amountWrap.style.transition = 'opacity 0.4s, transform 0.4s';
     amountWrap.style.opacity = '1';
     amountWrap.style.transform = 'scale(1)';
@@ -1231,7 +1259,10 @@ function openRedEnvelope() {
 }
 
 function closeRedEnvelope() {
-  document.getElementById('redEnvelopeOverlay').classList.remove('show');
+  const overlay = document.getElementById('redEnvelopeOverlay');
+  overlay.classList.remove('show');
+  const blessingEl = document.getElementById('redEnvelopeBlessing');
+  if (blessingEl) blessingEl.classList.remove('show');
 }
 
 document.addEventListener('DOMContentLoaded', renderFixedReview);
