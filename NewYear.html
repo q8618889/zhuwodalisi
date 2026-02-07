@@ -1241,32 +1241,32 @@ function bindRedEnvelope() {
   }
 }
 
-// 网易云会员概率：前 15 次固定 1/490；第 16～99 次线性升至最高 20%；第 100 次起 100% 必中
+// 网易云会员概率：前 15 次固定 1/490；第 16～99 次线性升至最高 20%；第 101 次起 100% 必中（每次进入/刷新页面次数归零）
 const RED_ENVELOPE_BASE_RATE = 1 / 490;
 const RED_ENVELOPE_SPECIAL_PRIZE = '🎵 网易云会员一个月';
-const RED_ENVELOPE_DRAW_KEY = 'red_envelope_draw_count';
 const RED_ENVELOPE_FLAT_DRAWS = 15;
 const RED_ENVELOPE_MAX_RATE = 0.2;
 const RED_ENVELOPE_PEAK_DRAW = 99;
-const RED_ENVELOPE_PITY_DRAWS = 99;
+const RED_ENVELOPE_PITY_DRAWS = 100;
 
 const HINT_NORMAL = '祝你好运🍀）';
 const HINT_SPECIAL = '祝你好运🍀';
 
+let redEnvelopeDrawCount = 0;
+
 function getRedEnvelopeDrawCount() {
-  const n = parseInt(localStorage.getItem(RED_ENVELOPE_DRAW_KEY), 10);
-  return isNaN(n) || n < 0 ? 0 : n;
+  return redEnvelopeDrawCount;
 }
 
 function setRedEnvelopeDrawCount(n) {
-  localStorage.setItem(RED_ENVELOPE_DRAW_KEY, String(n));
+  redEnvelopeDrawCount = n;
 }
 
 function getRedEnvelopeSpecialRate(drawCount) {
   if (drawCount < RED_ENVELOPE_FLAT_DRAWS) return RED_ENVELOPE_BASE_RATE;
   if (drawCount >= RED_ENVELOPE_PITY_DRAWS) return 1;
   const rampEnd = RED_ENVELOPE_PEAK_DRAW - 1;
-  const progress = (drawCount - RED_ENVELOPE_FLAT_DRAWS) / (rampEnd - RED_ENVELOPE_FLAT_DRAWS);
+  const progress = Math.min(1, (drawCount - RED_ENVELOPE_FLAT_DRAWS) / (rampEnd - RED_ENVELOPE_FLAT_DRAWS));
   return RED_ENVELOPE_BASE_RATE + (RED_ENVELOPE_MAX_RATE - RED_ENVELOPE_BASE_RATE) * progress;
 }
 
