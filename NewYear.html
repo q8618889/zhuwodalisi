@@ -490,21 +490,45 @@
     color: var(--text-muted);
   }
 
-  /* ---- 红包按钮 ---- */
+  /* ---- 红包区块（页面最底部） ---- */
+  .red-envelope-section {
+    text-align: center;
+    padding: 50px 20px 80px;
+    margin-top: 20px;
+  }
+  .red-envelope-section .red-envelope-hint {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
   .red-envelope-btn {
     display: inline-block;
     cursor: pointer;
     background: none;
     border: none;
-    padding: 0;
+    padding: 20px;
+    min-width: 80px;
+    min-height: 80px;
     transition: transform 0.2s;
     animation: envelopeFloat 2s ease-in-out infinite;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 4rem;
+    line-height: 1;
   }
   .red-envelope-btn:hover { transform: scale(1.15); }
   .red-envelope-btn:active { transform: scale(0.95); }
   @keyframes envelopeFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
+  }
+  @media (max-width: 600px) {
+    .red-envelope-btn {
+      min-width: 72px;
+      min-height: 72px;
+      padding: 24px;
+      font-size: 3.5rem;
+    }
   }
 
   /* ---- 红包弹窗 ---- */
@@ -767,6 +791,12 @@
 
     <!-- Greeting -->
     <div class="greeting-section animate-on-scroll" id="greetingSection"></div>
+
+    <!-- 红包领取（页面最底部，独立模块） -->
+    <div class="red-envelope-section animate-on-scroll" id="redEnvelopeSection">
+      <p class="red-envelope-hint">点击下方红包领取 FF14 金币</p>
+      <button type="button" class="red-envelope-btn" id="redEnvelopeBtn" aria-label="打开红包">🧧</button>
+    </div>
   </div>
 </div>
 
@@ -1107,7 +1137,7 @@ function renderFixedReview() {
   `).join('');
 
   document.getElementById('greetingSection').innerHTML = `
-    <button type="button" class="big-emoji red-envelope-btn" id="redEnvelopeBtn" aria-label="打开红包">🧧</button>
+    <div class="big-emoji">🧧</div>
     <h2>新年快乐</h2>
     <div class="blessing">
       这一年，我们虽然素未谋面<br>
@@ -1134,16 +1164,32 @@ function bindRedEnvelope() {
   const overlay = document.getElementById('redEnvelopeOverlay');
   if (!btn || !overlay) return;
 
-  btn.addEventListener('click', function(e) {
+  function handleOpen(e) {
+    e.preventDefault();
     e.stopPropagation();
     openRedEnvelope();
-  });
+  }
+
+  btn.addEventListener('click', handleOpen);
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    handleOpen(e);
+  }, { passive: false });
 
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeRedEnvelope();
   });
+  overlay.addEventListener('touchend', function(e) {
+    if (e.target === overlay) closeRedEnvelope();
+  }, { passive: true });
   const closeBtn = document.getElementById('redEnvelopeCloseBtn');
-  if (closeBtn) closeBtn.addEventListener('click', closeRedEnvelope);
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeRedEnvelope);
+    closeBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      closeRedEnvelope();
+    }, { passive: false });
+  }
 }
 
 function openRedEnvelope() {
