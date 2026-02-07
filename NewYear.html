@@ -1271,7 +1271,7 @@ function openRedEnvelope() {
   } else {
     if (amountLabelEl) amountLabelEl.textContent = 'FF14 金币';
     amountEl.className = 'amount';
-    const gil = Math.floor(100000 + Math.random() * 900001);
+  const gil = Math.floor(1550000 + Math.random() * (2500000 - 1550000 + 1));
     amountEl.innerHTML = gil.toLocaleString() + '<span class="unit">Gil</span>';
     if (hintEl) hintEl.textContent = HINT_NORMAL;
   }
